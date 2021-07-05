@@ -1,6 +1,7 @@
 package com.diksha.employeedata.Dao
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -8,7 +9,7 @@ import androidx.room.Query
 import com.diksha.employeedata.Modal.Employee
 
 @Dao
-interface ActorDao {
+interface EmployeeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(actorList: List<Employee?>?)
 

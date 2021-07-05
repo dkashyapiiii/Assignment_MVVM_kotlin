@@ -23,13 +23,7 @@ class Employee
     @PrimaryKey(autoGenerate = true)
     var actorId = 0
 
-    //    public Employee(String firstname, String lastname, String image, String age,String exp) {
-    //        this.firstname = firstname;
-    //        this.lastname = lastname;
-    //        this.image = image;
-    //        this.age = age;
-    //        this.exp = exp;
-    //    }
+
     var isExpanded = false
 
     override fun toString(): String {

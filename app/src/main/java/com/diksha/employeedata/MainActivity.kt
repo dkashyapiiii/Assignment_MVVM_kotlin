@@ -4,15 +4,15 @@ import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.net.ConnectivityManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -25,7 +25,7 @@ import com.diksha.employeedata.Modal.Employee
 import com.diksha.employeedata.ModelClass.EmployeeModel
 import com.diksha.employeedata.ModelClass.Maindata
 import com.diksha.employeedata.Network.Retrofit
-import com.diksha.employeedata.Repository.ActorRespository
+import com.diksha.employeedata.Repository.EmployeeRespository
 import com.diksha.employeedata.ViewModal.ActorViewModal
 import com.google.gson.Gson
 import retrofit2.Call
@@ -34,12 +34,13 @@ import retrofit2.Response
 import java.io.*
 import java.util.*
 
+
 class MainActivity : AppCompatActivity() {
 
     private var actorViewModal: ActorViewModal? = null
     private var recyclerView: RecyclerView? = null
     private var actorList: List<Employee>? = null
-    private var actorRespository: ActorRespository? = null
+    private var actorRespository: EmployeeRespository? = null
     private var actorAdapter: EmployeeAdapter? = null
     private var mSwipeRefreshLayout: SwipeRefreshLayout? = null
     var jsonb: Button? = null
@@ -125,7 +126,7 @@ class MainActivity : AppCompatActivity() {
         var layoutManager = LinearLayoutManager(this@MainActivity)
         recyclerView!!.layoutManager = layoutManager
         recyclerView!!.setHasFixedSize(true)
-        actorRespository = ActorRespository(application)
+        actorRespository = EmployeeRespository(application)
         actorList = ArrayList()
         actorAdapter = EmployeeAdapter(this, actorList as ArrayList<Employee>)
         actorViewModal = ViewModelProvider(this).get(ActorViewModal::class.java)
@@ -136,10 +137,17 @@ class MainActivity : AppCompatActivity() {
         val call = retrofit.api.allActors
         if (call != null) {
             call.enqueue(object : Callback<EmployeeModel?> {
-                override fun onResponse(call: Call<EmployeeModel?>, response: Response<EmployeeModel?>) {
+                override fun onResponse(
+                    call: Call<EmployeeModel?>,
+                    response: Response<EmployeeModel?>
+                ) {
                     if (response.isSuccessful) {
                         mSwipeRefreshLayout!!.isRefreshing = false
-                        actorRespository!!.insert(response.body()!!.banner1?.let { savetoparentmodel(it) })
+                        actorRespository!!.insert(response.body()!!.banner1?.let {
+                            savetoparentmodel(
+                                it
+                            )
+                        })
                         Log.d("main", "onResponse: " + response.body())
                     }
                 }
@@ -195,59 +203,43 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun getRealPathFromURI(context: MainActivity, contentUri: Uri?): String {
-        var cursor: Cursor? = null
-        return try {
-            val proj = arrayOf(MediaStore.Images.Media.DATA)
-            cursor = context.contentResolver.query(contentUri!!, proj, null, null, null)
-            val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
-            cursor.moveToFirst()
-            cursor.getString(column_index)
-        } finally {
-            cursor?.close()
-        }
-    }
-
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             FILE_SELECT_CODE -> if (resultCode == RESULT_OK && data!!.data != null) {
-                val uri = data.data
-                val path = getRealPathFromURI(this, uri)
-                ReadFile(path)
-                Toast.makeText(this, "Selected file path is:  $path", Toast.LENGTH_SHORT).show()
+                try {
+                    val uri = data.data
+                    Log.d("data", uri.toString());
+
+                    Parsetest(readTextFromUri(uri!!));
+                    Toast.makeText(this, uri.toString(), Toast.LENGTH_SHORT).show()
+
+                } catch (e: FileNotFoundException) {
+                    Log.d("error", e.message.toString());
+                    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    fun ReadFile(path: String?) {
-        mSwipeRefreshLayout!!.isRefreshing = true
-        val gson = Gson()
-        var text = ""
-        try {
-            val yourFile = File(path)
-            val inputStream: InputStream = FileInputStream(yourFile)
-            val stringBuilder = StringBuilder()
-            if (inputStream != null) {
-                val inputStreamReader = InputStreamReader(inputStream)
-                val bufferedReader = BufferedReader(inputStreamReader)
-                var receiveString: String? = ""
-                while (bufferedReader.readLine().also { receiveString = it } != null) {
-                    stringBuilder.append(receiveString)
+    @Throws(IOException::class)
+    private fun readTextFromUri(uri: Uri): String? {
+        val stringBuilder = java.lang.StringBuilder()
+        contentResolver.openInputStream(uri).use { inputStream ->
+            BufferedReader(
+                InputStreamReader(Objects.requireNonNull(inputStream))
+            ).use { reader ->
+                var line: String?
+                while (reader.readLine().also { line = it } != null) {
+                    stringBuilder.append(line)
                 }
-                inputStream.close()
-                text = stringBuilder.toString()
-                Parsetest(text)
-                Log.d("TAG", text)
             }
-        } catch (e: FileNotFoundException) {
-            Log.e("path", e.message!!)
-        } catch (e: IOException) {
-            Log.e("path", e.message!!)
         }
+        return stringBuilder.toString()
     }
 
-    private fun Parsetest(text: String) {
+    private fun Parsetest(text: String?) {
         val employeeModel = Gson().fromJson(text, EmployeeModel::class.java)
         actorAdapter = EmployeeAdapter(this@MainActivity, savetoparentmodel(employeeModel.banner1!!))
         recyclerView!!.adapter = actorAdapter
@@ -260,5 +252,4 @@ class MainActivity : AppCompatActivity() {
         private const val FILE_SELECT_CODE = 0
     }
 }
-
 

@@ -3,20 +3,21 @@ package com.diksha.employeedata.Repository
 import android.app.Application
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
-import com.diksha.employeedata.Dao.ActorDao
-import com.diksha.employeedata.Database.ActorDatabase
+import androidx.lifecycle.MutableLiveData
+import com.diksha.employeedata.Dao.EmployeeDao
+import com.diksha.employeedata.Database.EmployeeDatabase
 import com.diksha.employeedata.Modal.Employee
 
-class ActorRespository(application: Application?) {
-    private val database: ActorDatabase
+class EmployeeRespository(application: Application?) {
+    private val database: EmployeeDatabase
     val allActors: LiveData<List<Employee>>
     fun insert(actorList: List<Employee?>?) {
         InsertAsynTask(database).execute(actorList)
     }
 
-    internal class InsertAsynTask(actorDatabase: ActorDatabase) :
+    internal class InsertAsynTask(actorDatabase: EmployeeDatabase) :
         AsyncTask<List<Employee?>?, Void?, Void?>() {
-        private val actorDao: ActorDao
+        private val actorDao: EmployeeDao
 
         init {
             actorDao = actorDatabase.actorDao()
@@ -26,12 +27,10 @@ class ActorRespository(application: Application?) {
             actorDao.insert(params[0])
             return null
         }
-
-
     }
 
     init {
-        database = ActorDatabase.getInstance(application)!!
+        database = EmployeeDatabase.getInstance(application)!!
         allActors = database.actorDao().allActors
     }
 }

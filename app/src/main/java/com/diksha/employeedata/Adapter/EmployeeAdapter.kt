@@ -31,7 +31,6 @@ class EmployeeAdapter(var context: Context, employeeModelsroom: List<Employee>) 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         if (type == "live") {
             val employeeModel = employeeModels[position]
-            // bindview(employeeModel, holder, position);
         } else {
             bindviewroom(employeeModels[position], holder, position)
         }
@@ -98,46 +97,9 @@ class EmployeeAdapter(var context: Context, employeeModelsroom: List<Employee>) 
             employeeModel.isExpanded = !expanded
             notifyItemChanged(position)
         }
-    } //    void bindview(Employee employeeModel, ViewHolder holder, int position) {
+    }
 
-    //
-    //        holder.title.setText(employeeModel.getFirstname() + " " + employeeModel.getLastname());
-    //        holder.name.setText(employeeModel.getFirstname() + " " + employeeModel.getLastname());
-    //        holder.age.setText(employeeModel.getAge() + " " + employeeModel.getGender());
-    //        holder.desig.setText(employeeModel.getJobholder().getRole() + " at " + employeeModel.getJobholder().getOrganization());
-    //        holder.education.setText(employeeModel.getEducation().getDegree() + ", " + employeeModel.getEducation().getInstitution());
-    //        Picasso.get().load(employeeModel.getPicture()).into(holder.imageView);
-    //        Picasso.get().load(employeeModel.getPicture()).into(holder.imageViewprofile);
-    //
-    //        boolean expanded = employeeModel.isExpanded();
-    //        holder.linearLayout.setVisibility(expanded ? View.VISIBLE : View.GONE);
-    //        holder.linearLayoutcollapsed.setVisibility(expanded ? View.GONE : View.VISIBLE);
-    //        holder.linearLayout.startAnimation(expanded ?
-    //                AnimationUtils.loadAnimation(context, R.anim.slide_down) : AnimationUtils.loadAnimation(context, R.anim.slide_up));
-    //
-    //        holder.linearLayoutcollapsed.setOnClickListener(new View.OnClickListener() {
-    //            @Override
-    //            public void onClick(View view) {
-    //                boolean expanded = employeeModel.isExpanded();
-    //                employeeModel.setExpanded(!expanded);
-    //                notifyItemChanged(position);
-    //            }
-    //        });
-    //        holder.linearLayout.setOnClickListener(new View.OnClickListener() {
-    //            @Override
-    //            public void onClick(View view) {
-    //                boolean expanded = employeeModel.isExpanded();
-    //                employeeModel.setExpanded(!expanded);
-    //                notifyItemChanged(position);
-    //
-    //            }
-    //        });
-    //    }
-    //    public EmployeeAdapter(Context context, List<Maindata> employeeModels, String type) {
-    //        this.context = context;
-    //        this.type = type;
-    //        this.employeeModels = employeeModels;
-    //    }
+
     init {
         type = type
         employeeModels = employeeModelsroom

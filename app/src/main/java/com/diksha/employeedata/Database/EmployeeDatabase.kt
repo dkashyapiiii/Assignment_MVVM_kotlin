@@ -6,37 +6,37 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.diksha.employeedata.Dao.ActorDao
+import com.diksha.employeedata.Dao.EmployeeDao
 import com.diksha.employeedata.Modal.Employee
 
 @Database(entities = [Employee::class], version = 8)
-abstract class ActorDatabase : RoomDatabase() {
-    abstract fun actorDao(): ActorDao
-    internal class PopulateAsynTask(actorDatabase: ActorDatabase?) :
+abstract class EmployeeDatabase : RoomDatabase() {
+    abstract fun actorDao(): EmployeeDao
+    internal class PopulateAsynTask(actorDatabase: EmployeeDatabase?) :
         AsyncTask<Void?, Void?, Void?>() {
-        private val actorDao: ActorDao
-
+        private val actorDao: EmployeeDao
 
         init {
             actorDao = actorDatabase!!.actorDao()
         }
 
-       protected override fun doInBackground(vararg params: Void?): Void? {
+        protected override fun doInBackground(vararg params: Void?): Void? {
             actorDao.deleteAll()
-            return null        }
+            return null
+        }
     }
 
     companion object {
         private const val DATABASE_NAME = "EmployeeDatabase"
 
         @Volatile
-        private var INSTANCE: ActorDatabase? = null
-        fun getInstance(context: Context?): ActorDatabase? {
+        private var INSTANCE: EmployeeDatabase? = null
+        fun getInstance(context: Context?): EmployeeDatabase? {
             if (INSTANCE == null) {
-                synchronized(ActorDatabase::class.java) {
+                synchronized(EmployeeDatabase::class.java) {
                     if (INSTANCE == null) {
                         INSTANCE = Room.databaseBuilder(
-                            context!!, ActorDatabase::class.java,
+                            context!!, EmployeeDatabase::class.java,
                             DATABASE_NAME
                         )
                             .addCallback(callback)
