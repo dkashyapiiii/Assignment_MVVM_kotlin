@@ -70,11 +70,43 @@ class EmployeeAdapter(var context: Context, employeeModelsroom: List<Employee>) 
 
     fun bindviewroom(employeeModel: Employee, holder: ViewHolder, position: Int) {
 
-        holder.title.text = employeeModel.firstname + " " + employeeModel.lastname
-        holder.name.text = employeeModel.firstname + " " + employeeModel.lastname
-        holder.age.text = employeeModel.age + " " + employeeModel.gender
-        holder.desig.text = employeeModel.role + " at " + employeeModel.org
-        holder.education.text = employeeModel.degree + ", " + employeeModel.institution
+
+        if(employeeModel.firstname.isNullOrEmpty()){
+            holder.title.text = "" + " " + employeeModel.lastname
+            holder.name.text = "" + " " + employeeModel.lastname
+        }
+        else if(employeeModel.lastname.isNullOrEmpty()){
+            holder.title.text = employeeModel.firstname + " " + ""
+            holder.name.text = employeeModel.firstname + " " + ""
+        }else{
+            holder.title.text = employeeModel.firstname + " " + employeeModel.lastname
+            holder.name.text = employeeModel.firstname + " " + employeeModel.lastname
+        }
+        if(employeeModel.age.isNullOrEmpty()){
+            holder.age.text = "" + " " + employeeModel.gender
+        }
+        else if(employeeModel.gender.isNullOrEmpty()){
+            holder.age.text = employeeModel.age + " " + ""
+        }else{
+            holder.age.text = employeeModel.age + " " + employeeModel.gender
+        }
+        if(employeeModel.role.isNullOrEmpty()){
+            holder.desig.text = "" + " at " + employeeModel.org
+        }
+        else if(employeeModel.org.isNullOrEmpty()){
+            holder.desig.text = employeeModel.role + " at " + ""
+        }else{
+            holder.desig.text = employeeModel.role + " at " + employeeModel.org
+        }
+        if(employeeModel.degree.isNullOrEmpty()){
+            holder.education.text = "" + ", " + employeeModel.institution
+        }
+        else if(employeeModel.institution.isNullOrEmpty()){
+            holder.education.text = employeeModel.degree + ", " + ""
+        }else{
+            holder.education.text = employeeModel.degree + ", " + employeeModel.institution
+
+        }
         Picasso.get().load(employeeModel.picture).into(holder.imageView)
         Picasso.get().load(employeeModel.picture).into(holder.imageViewprofile)
         val expanded = employeeModel.isExpanded
