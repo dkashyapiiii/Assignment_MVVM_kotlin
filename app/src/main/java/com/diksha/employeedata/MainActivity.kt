@@ -33,6 +33,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.*
 import java.util.*
+import java.util.stream.Stream
 
 
 class MainActivity : AppCompatActivity() {
@@ -65,7 +66,7 @@ class MainActivity : AppCompatActivity() {
             handler.postDelayed({
                 if (mSwipeRefreshLayout!!.isRefreshing) {
                     if (isNetworkConnected) {
-                        networkRequest()
+                        responseRequest()
                         mSwipeRefreshLayout!!.isRefreshing = true
                     } else {
                         Toast.makeText(
@@ -132,7 +133,8 @@ class MainActivity : AppCompatActivity() {
         actorViewModal = ViewModelProvider(this).get(ActorViewModal::class.java)
     }
 
-    private fun networkRequest() {
+
+    private fun responseRequest() {
         val retrofit = Retrofit()
         val call = retrofit.api.allActors
         if (call != null) {
@@ -142,6 +144,10 @@ class MainActivity : AppCompatActivity() {
                     response: Response<EmployeeModel?>
                 ) {
                     if (response.isSuccessful) {
+                        mSwipeRefreshLayout!!.isRefreshing = false
+                        actorAdapter = EmployeeAdapter(this@MainActivity, savetoparentmodel(response.body()!!.banner1!!))
+                        recyclerView!!.adapter = actorAdapter
+                        actorAdapter!!.notifyDataSetChanged()
                         mSwipeRefreshLayout!!.isRefreshing = false
                         actorRespository!!.insert(response.body()!!.banner1?.let {
                             savetoparentmodel(
@@ -159,8 +165,38 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun networkRequest() {
+        val retrofit = Retrofit()
+        val call = retrofit.api.allActors
+        if (call != null) {
+            call.enqueue(object : Callback<EmployeeModel?> {
+                override fun onResponse(
+                    call: Call<EmployeeModel?>,
+                    response: Response<EmployeeModel?>
+                ) {
+                    if (response.isSuccessful) {
+                        mSwipeRefreshLayout!!.isRefreshing = false
+
+                        actorRespository!!.insert(response.body()!!.banner1?.let {
+                            savetoparentmodel(
+                                it
+                            )
+                        })
+                        Log.d("main", "onResponse: " + response.body())
+                    }
+                }
+
+                override fun onFailure(call: Call<EmployeeModel?>, t: Throwable) {
+                    Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+    }
+
+
     private fun savetoparentmodel(employeeModeldata: List<Maindata>): List<Employee> {
         val data: MutableList<Employee> = ArrayList()
+
         for (i in employeeModeldata.indices) {
             val ld = Employee(
                 employeeModeldata[i].firstname,
