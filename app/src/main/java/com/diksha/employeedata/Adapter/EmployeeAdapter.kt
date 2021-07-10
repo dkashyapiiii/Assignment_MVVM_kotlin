@@ -21,6 +21,8 @@ class EmployeeAdapter(var context: Context, employeeModelsroom: List<Employee>) 
 
     fun getAllMyModels(MyModelList: List<Employee>) {
         employeeModels = MyModelList
+        notifyDataSetChanged()
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -68,8 +70,8 @@ class EmployeeAdapter(var context: Context, employeeModelsroom: List<Employee>) 
         }
     }
 
-    fun bindviewroom(employeeModel: Employee, holder: ViewHolder, position: Int) {
 
+    fun bindviewroom(employeeModel: Employee, holder: ViewHolder, position: Int) {
 
         if(employeeModel.firstname.isNullOrEmpty()){
             holder.title.text = "" + " " + employeeModel.lastname
@@ -110,6 +112,7 @@ class EmployeeAdapter(var context: Context, employeeModelsroom: List<Employee>) 
         Picasso.get().load(employeeModel.picture).into(holder.imageView)
         Picasso.get().load(employeeModel.picture).into(holder.imageViewprofile)
         val expanded = employeeModel.isExpanded
+
         holder.linearLayout.visibility = if (expanded) View.VISIBLE else View.GONE
         holder.linearLayoutcollapsed.visibility = if (expanded) View.GONE else View.VISIBLE
         holder.linearLayout.startAnimation(
